@@ -1,0 +1,212 @@
+:root {
+    --primary-green: #22c55e;
+    --sky-blue: #87CEEB;
+    --smog-gray: #708090;
+}
+
+* {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Quicksand', sans-serif;
+    background-color: #f8fafc;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+}
+
+h1, h2, h3, .brand {
+    font-family: 'Fredoka One', cursive;
+}
+
+.font-mono {
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* Watering Can */
+.can-tilt {
+    animation: pour 0.5s ease-in-out;
+}
+@keyframes pour {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-25deg) translateY(-2px); }
+}
+
+/* Animations */
+@keyframes rotateSun {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.sun-rays {
+    animation: rotateSun 20s linear infinite;
+    transform-origin: center;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+    animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+.animate-pop-in {
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Factory Smoke Puffs */
+@keyframes smoke-puff {
+    0% { transform: translateY(0) scale(0.5); opacity: 0; }
+    20% { opacity: 0.6; }
+    100% { transform: translateY(-40px) scale(2); opacity: 0; }
+}
+
+.smoke-puff {
+    fill: #718096;
+    animation: smoke-puff 3s linear infinite;
+    transform-origin: center;
+    transform-box: fill-box;
+}
+
+/* Window Flicker */
+@keyframes flicker {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+}
+.window-flicker {
+    animation: flicker 2s infinite alternate ease-in-out;
+}
+
+/* Traffic Animation */
+@keyframes car-move {
+    from { transform: translateX(-100px); }
+    to { transform: translateX(1100px); }
+}
+.car-svg {
+    animation: car-move 10s linear infinite;
+}
+
+/* Rainstorm Animation */
+.raindrop {
+    position: absolute;
+    width: 2px;
+    height: 15px;
+    background: linear-gradient(transparent, #93c5fd);
+    border-radius: 20%;
+    animation: rainFall 0.5s linear infinite;
+    z-index: 30;
+}
+
+@keyframes rainFall {
+    0% { transform: translateY(-20px) translateX(10px) rotate(15deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(30vh) translateX(-10px) rotate(15deg); opacity: 0; }
+}
+
+.flash-lightning {
+    animation: lightning 0.5s ease-out;
+}
+
+@keyframes lightning {
+    0% { background-color: #f8fafc; }
+    20% { background-color: #cbd5e1; }
+    50% { background-color: #f8fafc; }
+    80% { background-color: #64748b; }
+    100% { background-color: #f8fafc; }
+}
+
+/* Breathing Lungs */
+@keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+.lung-svg {
+    animation: breathe 3s infinite ease-in-out;
+    transform-origin: center;
+}
+
+/* Smog Drifting */
+@keyframes drift {
+    from { transform: translateX(0) translateY(0); }
+    to { transform: translateX(100vw) translateY(10vh); }
+}
+.particle {
+    position: absolute;
+    background: rgba(112, 128, 144, 0.4);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+/* Concept Buttons */
+.concept-btn.active {
+    border-color: #3b82f6 !important;
+    background: #eff6ff !important;
+    transform: scale(0.95);
+}
+.concept-btn.active span { color: #1d4ed8 !important; }
+.concept-btn.active svg { color: #3b82f6 !important; }
+
+/* Inversion Lid Animation */
+.inversion-active {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+
+/* Environmental Transitions */
+.smog-layer {
+    transition: opacity 2s ease-in-out;
+}
+
+.tree-svg {
+    filter: drop-shadow(0 10px 8px rgba(0,0,0,0.1));
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Tree Dance */
+@keyframes treeDance {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.1, 0.9) rotate(-3deg); }
+    50% { transform: scale(0.9, 1.1) rotate(3deg); }
+}
+.dancing { animation: treeDance 0.6s ease-in-out; }
+
+/* Watering can tilt */
+.watering-can {
+    transition: transform 0.3s ease;
+}
+.can-tilt {
+    transform: rotate(-35deg) translate(-5px, -2px);
+}
+
+/* Scrollbar Hide */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Water Drop Fall */
+.water-drop {
+    position: absolute;
+    pointer-events: none;
+    z-index: 150;
+    animation: fall 0.6s linear forwards;
+}
+@keyframes fall {
+    0% { transform: translateY(0) scale(1.5); opacity: 1; }
+    100% { transform: translateY(100px) scale(0.5); opacity: 0; }
+}
+
+.butterfly { animation: flutter 4s infinite ease-in-out; }
+@keyframes flutter {
+    0%, 100% { transform: translate(0,0) rotate(0deg); }
+    25% { transform: translate(5px, -10px) rotate(10deg); }
+    50% { transform: translate(-2px, -15px) rotate(-10deg); }
+    75% { transform: translate(-8px, -5px) rotate(5deg); }
+}

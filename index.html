@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Grow Tree - Air Simulation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="h-screen overflow-hidden bg-f0fdf4">
+
+    <!-- Start Menu Screen -->
+    <div id="menuScreen" class="fixed inset-0 z-[500] flex flex-col items-center justify-center p-6 bg-slate-900 text-center animate-fade-in">
+        <div class="mb-8">
+            <svg class="w-32 h-32 mx-auto mb-4 animate-pulse" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="none" stroke="#22c55e" stroke-width="2" stroke-dasharray="10,5"/>
+                <path d="M30 50 Q50 20 70 50 T30 50" fill="#22c55e" opacity="0.5"/>
+                <text x="50" y="55" text-anchor="middle" font-size="20" fill="white">AQI</text>
+            </svg>
+            <h1 class="brand text-4xl text-white mb-2 leading-tight">Grow Tree</h1>
+            <p class="text-green-400 font-mono text-sm opacity-80 uppercase tracking-widest">Interactive Exhibition</p>
+        </div>
+        
+        <div class="space-y-4 w-full max-w-xs">
+            <button onclick="startGame()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-2xl text-xl shadow-lg transform transition active:scale-95">
+                ENTER LAB
+            </button>
+            <button onclick="showInfoModal()" class="w-full bg-slate-800 text-slate-300 font-bold py-3 px-8 rounded-2xl border border-slate-700 active:scale-95">
+                RESEARCH DATA
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Game Screen -->
+    <main id="gameScreen" class="hidden h-screen flex flex-col relative select-none">
+        
+        <!-- Scientific Dashboard Header -->
+        <header class="py-2 px-4 grid grid-cols-4 gap-2 bg-slate-900 border-b-2 border-green-500 z-50 text-white shadow-2xl">
+            <div class="flex flex-col items-center">
+                <span class="text-[7px] text-green-400 font-bold uppercase tracking-widest">Filtration</span>
+                <span id="statPM" class="text-xs font-mono">0%</span>
+            </div>
+            <div class="flex flex-col items-center border-l border-white/10">
+                <span class="text-[7px] text-blue-400 font-bold uppercase tracking-widest">CO2 Sink</span>
+                <span id="statCO2" class="text-xs font-mono">0g</span>
+            </div>
+            <div class="flex flex-col items-center border-l border-white/10">
+                <span class="text-[7px] text-orange-400 font-bold uppercase tracking-widest">O2 Prod</span>
+                <span id="statO2" class="text-xs font-mono">0L</span>
+            </div>
+            <div class="flex items-center justify-center border-l border-white/10">
+                <div id="lungIndicator" class="lung-svg w-6 h-6 p-0.5">
+                    <svg viewBox="0 0 100 100" class="w-full h-full">
+                        <path d="M50 20 C60 10 90 10 90 50 C90 80 50 90 50 90 C50 90 10 80 10 50 C10 10 40 10 50 20" fill="#fca5a5" id="lungFill"/>
+                    </svg>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Environment -->
+        <section class="h-[28vh] relative bg-blue-100 overflow-hidden shrink-0 border-b-4 border-slate-800/10">
+            <div id="particleField" class="absolute inset-0 z-10 pointer-events-none"></div>
+
+            <!-- Animated Sun -->
+            <svg class="absolute top-2 right-2 w-14 h-14 cursor-pointer z-30" viewBox="0 0 100 100" onclick="boostGrowth()">
+                <g class="sun-rays"><path d="M50 10 L50 20 M90 50 L80 50 M50 90 L50 80 M10 50 L20 50 M78 22 L71 29 M78 78 L71 71 M22 78 L29 71 M22 22 L29 29" stroke="#FFD700" stroke-width="6" stroke-linecap="round"/></g>
+                <circle cx="50" cy="50" r="25" fill="#FFD700" stroke="#FFA500" stroke-width="2"/>
+            </svg>
+
+            <!-- Scenario Layer -->
+            <div class="absolute bottom-0 w-full z-20">
+                <svg viewBox="0 0 1000 200" preserveAspectRatio="none" class="w-full h-32 sm:h-40">
+                    <path d="M0 160 L150 60 L350 130 L550 40 L800 150 L1000 90 L1000 200 L0 200 Z" fill="#b1c9d9"/>
+                    
+                    <!-- Advanced Factory -->
+                    <g id="factoryGroup" class="transition-all duration-700">
+                        <rect x="750" y="100" width="80" height="60" fill="#4b5563"/>
+                        <rect x="760" y="60" width="15" height="40" fill="#374151"/>
+                        <rect x="795" y="40" width="15" height="60" fill="#374151"/>
+                        <!-- Smoke Puffs Container -->
+                        <g id="factorySmoke" class="smoke-puffs opacity-0"></g>
+                        <!-- Windows -->
+                        <rect class="window-flicker" x="765" y="115" width="10" height="10" fill="#fde047" opacity="0.3"/>
+                        <rect class="window-flicker" x="790" y="115" width="10" height="10" fill="#fde047" opacity="0.3" style="animation-delay: 0.5s"/>
+                    </g>
+
+                    <!-- Traffic Layer -->
+                    <g id="trafficLine" class="opacity-0 transition-opacity">
+                        <rect x="0" y="155" width="1000" height="5" fill="#475569" opacity="0.3"/>
+                        <g id="carContainer"></g>
+                    </g>
+
+                    <!-- TV Tower -->
+                    <rect x="180" y="40" width="4" height="120" fill="#334155"/>
+                    <circle cx="182" cy="60" r="10" fill="#ef4444" opacity="0.8"/>
+                </svg>
+            </div>
+
+            <!-- Thermal Inversion Lid -->
+            <div id="inversionLid" class="absolute inset-0 z-20 pointer-events-none transition-all duration-1000 opacity-0 translate-y-[-100%]">
+                <div class="h-1/2 bg-gradient-to-b from-orange-900/40 via-blue-900/20 to-transparent"></div>
+                <div class="absolute top-10 w-full text-center text-[10px] text-orange-400 font-bold tracking-[0.5em] uppercase">Temperature Inversion Lid</div>
+            </div>
+
+            <!-- Obsolete microscope view removed. Rain affects the main layer instead. -->
+
+            <div id="smogOverlay" class="smog-layer absolute inset-0 bg-gray-600/30 pointer-events-none z-10 transition-opacity duration-1000"></div>
+        </section>
+
+        <!-- Lab Stage -->
+        <section class="flex-grow flex flex-col items-center justify-between pb-4 pt-4 relative z-10 bg-white rounded-t-[3rem] -mt-6 shadow-2xl">
+            
+            <!-- Context Explorer Bar -->
+            <div class="w-full flex justify-center gap-2 px-4 mt-2 mb-4 relative z-40">
+                <button onclick="togglePollution('factory')" id="btnFactory" class="concept-btn flex flex-col items-center p-2 rounded-2xl bg-white shadow-xl border-2 border-slate-100 min-w-[70px] active:scale-95">
+                    <div class="h-8 mb-1 flex items-center"><svg class="w-6 h-6 text-slate-400" viewBox="0 0 24 24" fill="currentColor"><path d="M2,22V16L7,10V22H2M12,22V8L17,2V22H12Z"/></svg></div>
+                    <span class="text-[7px] font-bold text-slate-500 uppercase">Industry</span>
+                </button>
+                <button onclick="togglePollution('traffic')" id="btnTraffic" class="concept-btn flex flex-col items-center p-2 rounded-2xl bg-white shadow-xl border-2 border-slate-100 min-w-[70px] active:scale-95">
+                    <div class="h-8 mb-1 flex items-center"><svg class="w-6 h-6 text-slate-400" viewBox="0 0 24 24" fill="currentColor"><path d="M18.92,6.01C18.72,5.42 18.16,5 17.5,5H6.5C5.84,5 5.28,5.42 5.08,6.01L3,12V20C3,20.55 3.45,21 4,21H5C5.55,21 6,20.55 6,20V19H18V20C18,20.55 18.45,21 19,21H20C20.55,21 21,20.55 21,20V12L18.92,6.01M6.5,16A1.5,1.5 0 0,1 5,14.5A1.5,1.5 0 0,1 6.5,13A1.5,1.5 0 0,1 8,14.5A1.5,1.5 0 0,1 6.5,16M17.5,16A1.5,1.5 0 0,1 16,14.5A1.5,1.5 0 0,1 17.5,13A1.5,1.5 0 0,1 19,14.5A1.5,1.5 0 0,1 17.5,16Z"/></svg></div>
+                    <span class="text-[7px] font-bold text-slate-500 uppercase">Traffic</span>
+                </button>
+                <button onclick="toggleConcept('inversion')" id="btnInversion" class="concept-btn flex flex-col items-center p-2 rounded-2xl bg-white shadow-xl border-2 border-slate-100 min-w-[70px] active:scale-95">
+                    <div class="h-8 mb-1 flex items-center"><svg class="w-6 h-6 text-slate-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z"/></svg></div>
+                    <span class="text-[7px] font-bold text-slate-500 uppercase">Inversion</span>
+                </button>
+                <button onclick="triggerRainstorm()" id="btnRain" class="concept-btn flex flex-col items-center p-2 rounded-2xl bg-white shadow-xl border-2 border-slate-100 min-w-[70px] active:scale-95">
+                    <div class="h-8 mb-1 flex items-center">
+                        <svg class="w-6 h-6 text-slate-400" viewBox="0 0 24 24" fill="currentColor"><path d="M17 13 L15 17 M13 13 L11 17 M9 13 L7 17 M22 10.5C22 13.54 19.54 16 16.5 16H6C3.24 16 1 13.76 1 11C1 8.5 2.82 6.43 5.23 6.07C6.06 4.3 7.9 3 10 3C13.1 3 15.65 5.3 16.09 8.27C18.82 8.44 21 10.74 21 13.5C21 13.55 21 13.6 21 13.65C21.6 12.83 22 11.71 22 10.5Z"/></svg>
+                    </div>
+                    <span class="text-[7px] font-bold text-slate-500 uppercase">Rainstorm</span>
+                </button>
+            </div>
+
+            <div class="text-center w-full px-6 -mt-2 mb-4 flex items-center justify-between gap-4">
+                <div class="flex-grow text-left">
+                    <div class="flex justify-between items-baseline mb-1">
+                        <h2 id="treeTitle" class="text-xl text-slate-800 font-bold">Baby Sprout</h2>
+                        <span id="growthLevel" class="text-[10px] text-green-600 font-bold font-mono">Lvl 1</span>
+                    </div>
+                    <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+                        <div id="treeProgress" class="h-full bg-blue-500 transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <!-- AQI Gauge -->
+                <div class="relative w-16 h-10 flex flex-col items-center shrink-0">
+                    <svg viewBox="0 0 100 60" class="w-full h-full">
+                        <path d="M10 50 A40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="8" stroke-linecap="round"/>
+                        <path d="M10 50 A40 40 0 0 1 30 18" fill="none" stroke="#ef4444" stroke-width="8"/>
+                        <path d="M30 18 A40 40 0 0 1 70 18" fill="none" stroke="#eab308" stroke-width="8"/>
+                        <path d="M70 18 A40 40 0 0 1 90 50" fill="none" stroke="#22c55e" stroke-width="8"/>
+                        <line id="gaugeNeedle" x1="50" y1="50" x2="50" y2="15" stroke="#1e293b" stroke-width="3" stroke-linecap="round" style="transform-origin: 50px 50px; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform: rotate(-80deg);"/>
+                        <circle cx="50" cy="50" r="4" fill="#1e293b"/>
+                    </svg>
+                    <span id="aqiStatus" class="text-[6px] font-bold mt-1 uppercase tracking-tighter">Healthy</span>
+                </div>
+            </div>
+
+            <div id="stage" class="relative">
+                <div id="butterflyContainer" class="absolute inset-0 hidden pointer-events-none">
+                    <span class="butterfly absolute text-2xl -top-10 -left-10">🦋</span>
+                    <span class="butterfly absolute text-2xl -top-20 right-0" style="animation-delay: 1s">🦋</span>
+                </div>
+
+                <div id="treeClickArea" class="cursor-pointer select-none" onclick="handleTreeInteraction(event)">
+                    <svg id="treeSVG" class="tree-svg w-36 h-44 sm:w-44 sm:h-52" viewBox="0 0 100 120">
+                        <path id="trunk" d="M35,110 L65,110 L58,60 L42,60 Z" fill="#6d4c41"/>
+                        <g id="arms">
+                            <path id="armL" d="M42,85 L28,70 L31,65 L42,78" fill="#6d4c41"/>
+                            <path id="armR" d="M58,85 L72,70 L69,65 L58,78" fill="#6d4c41"/>
+                        </g>
+                        <path id="leaves" d="M30,60 Q15,45 35,25 Q50,5 65,25 Q85,45 70,65 Q50,80 30,60" fill="#4CAF50"/>
+                        <g id="face">
+                            <circle cx="45" cy="72" r="1.5" fill="#000"/>
+                            <circle cx="55" cy="72" r="1.5" fill="#000"/>
+                            <path id="mouth" d="M48,78 Q50,81 52,78" stroke="#000" fill="none" stroke-width="1.2" stroke-linecap="round"/>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="w-full px-6 mb-2 grid grid-cols-2 gap-3">
+                <button onclick="pourWater()" class="bg-blue-500 hover:bg-blue-400 active:bg-blue-600 text-white rounded-2xl py-3 font-bold text-[15px] sm:text-lg shadow-[0_6px_0_#2563eb] active:translate-y-1.5 active:shadow-[0_0px_0_#2563eb] transition-all flex items-center justify-center gap-2 outline-none">
+                    <div id="canIcon" class="pointer-events-none origin-bottom-right drop-shadow-md">
+                        <svg width="24" height="20" viewBox="0 0 60 40"><path d="M10 15 L40 15 L40 40 L10 40 Z" fill="white"/><path d="M40 25 L55 15 L55 20 L40 30" fill="white"/><path d="M10 20 Q0 20 0 30 Q0 40 10 40" fill="none" stroke="white" stroke-width="4"/></svg>
+                    </div>
+                    WATER
+                </button>
+                <button onclick="showDonateModal()" id="btnDonate" class="bg-green-500 hover:bg-green-400 active:bg-green-600 text-white rounded-2xl py-3 font-bold text-[15px] sm:text-lg shadow-[0_6px_0_#16a34a] active:translate-y-1.5 active:shadow-[0_0px_0_#16a34a] transition-all flex items-center justify-center gap-1 relative overflow-hidden group outline-none tracking-tight">
+                    <span class="text-xl drop-shadow-md relative z-10">🌳</span> <span class="relative z-10 text-white shadow-black">DONATE $5</span>
+                    <div class="absolute inset-0 bg-white/30 translate-x-[-100%] group-active:translate-x-[100%] transition-transform duration-500 z-0"></div>
+                </button>
+            </div>
+            <div class="text-[8px] text-slate-400 font-bold uppercase tracking-widest font-mono">Simulated Impact Analysis System v2.1</div>
+
+            <!-- Species Repository -->
+            <footer class="w-full h-[10vh] bg-slate-50/50 flex flex-col pt-2 border-t border-slate-100 px-4">
+                <div class="flex-grow flex gap-2 overflow-x-auto scrollbar-hide py-1" id="groveGrid"></div>
+            </footer>
+        </section>
+
+    </main>
+
+    <!-- Research Info Modal -->
+    <div id="infoModal" class="hidden modal-overlay fixed inset-0 z-[600] flex items-center justify-center p-4 bg-slate-900/95 backdrop-blur-xl">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full relative shadow-2xl animate-pop-in">
+            <button onclick="hideInfoModal()" class="absolute top-4 right-4 text-3xl text-slate-300 hover:text-slate-600">&times;</button>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">🔬</div>
+                <h2 class="brand text-2xl text-slate-800 mb-2">The Science of Smog</h2>
+                <div class="text-left text-xs space-y-4 mb-6 text-slate-600 font-medium">
+                    <p class="border-l-4 border-orange-400 pl-3"><strong>Inversion:</strong> Hot air from the sun usually lifts smog away. But in Bishkek winters, cold mountain air creates a heavy lid that traps poisons at our eye level.</p>
+                    <p class="border-l-4 border-red-400 pl-3"><strong>PM2.5:</strong> These particles are so small (2.5 microns) that your body cannot filter them out. They cause long-term damage to the heart and brain.</p>
+                    <p class="border-l-4 border-green-500 pl-3"><strong>Green Lungs:</strong> Trees don't just 'make air', they act as massive sponges that physically catch coal dust on their leaves.</p>
+                </div>
+                <button onclick="hideInfoModal()" class="w-full bg-slate-800 text-white font-bold py-4 rounded-2xl shadow-lg border-b-4 border-slate-950">RETURN TO LAB</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- IRL Donate Modal -->
+    <div id="donateModal" class="hidden absolute inset-0 z-[600] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-24 bg-green-500 rounded-t-3xl -z-10"></div>
+            
+            <button onclick="hideDonateModal()" class="absolute top-4 right-4 text-white hover:text-green-100 text-3xl active:scale-95 transition-transform font-bold outline-none leading-none">&times;</button>
+            
+            <div class="text-center mt-4">
+                <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto shadow-xl mb-4 text-5xl border-4 border-green-500">🌳</div>
+                <h2 class="text-3xl font-bold text-slate-800 brand mb-2 tracking-wide text-balance">Plant a Real Tree</h2>
+                <p class="text-slate-600 text-[13px] mb-6 leading-relaxed font-semibold">Your $5 donation buys, plants, and maintains one sapling in Bishkek, filtering PM2.5 for decades to come.</p>
+                
+                <div class="bg-slate-50 border-2 border-slate-100 rounded-xl p-4 mb-6">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">Select Donation Tier</p>
+                    <div class="flex gap-2 justify-center">
+                        <button class="flex-1 bg-green-100 text-green-700 font-bold text-xl py-3 rounded-xl border-2 border-green-500 shadow-sm pointer-events-none">$5.00</button>
+                    </div>
+                </div>
+
+                <button onclick="confirmDonation()" class="w-full bg-green-500 hover:bg-green-400 active:bg-green-600 text-white rounded-2xl py-4 font-bold text-xl shadow-[0_6px_0_#16a34a] active:translate-y-1.5 active:shadow-[0_0px_0_#16a34a] transition-all flex items-center justify-center gap-2 relative overflow-hidden group outline-none">
+                    <span class="relative z-10 text-white drop-shadow-md">CONFIRM DONATION</span>
+                    <div class="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                </button>
+                <div class="mt-4 text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center opacity-70">Simulated Transaction for Science Fair</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Lab Feedback -->
+    <div id="toast" class="fixed top-24 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md text-slate-800 px-6 py-2 rounded-2xl font-bold shadow-2xl opacity-0 transition-all z-[700] pointer-events-none text-[10px] text-center min-w-[250px] border border-blue-100"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
