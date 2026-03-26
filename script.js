@@ -63,7 +63,7 @@ function addCoins(amount) {
 // ==========================================
 
 window.startGame = function() {
-    const intro = document.getElementById('introScreen');
+    const intro = document.getElementById('menuScreen');
     if (intro) intro.classList.add('hidden');
     
     const game = document.getElementById('gameScreen');
@@ -335,6 +335,8 @@ window.toggleCareMenu = function() {
 };
 
 window.showEcoModal = function() { document.getElementById('ecoModal').classList.remove('hidden'); };
+window.showInfoModal = window.showEcoModal; // Map legacy button to the new pollution modal
+
 window.simulateDonate = function() {
     document.getElementById('ecoModal').classList.add('hidden');
     toast("Thank you for your $5 simulated donation! +500 🪙");
