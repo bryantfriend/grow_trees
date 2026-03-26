@@ -158,8 +158,8 @@
 
             <div id="stage" class="relative w-full flex justify-center">
                 <!-- Water Source (Hidden by default) -->
-                <div id="waterWell" class="absolute bottom-2 left-6 w-16 h-12 bg-blue-300 rounded-full border-4 border-slate-400 shadow-inner flex items-center justify-center opacity-90 transition-all scale-0 origin-bottom">
-                   <span class="text-xl">🌊</span>
+                <div id="waterWell" class="absolute top-4 right-4 sm:top-8 sm:right-8 w-16 h-14 bg-gradient-to-b from-blue-200 to-blue-400 rounded-full border-[3px] border-slate-300 shadow-[inset_0_-4px_8px_rgba(0,0,0,0.2)] flex items-center justify-center opacity-90 transition-all scale-0 origin-center z-[100]">
+                   <span class="text-2xl drop-shadow-md pb-1">🌊</span>
                 </div>
 
                 <div id="butterflyContainer" class="absolute inset-0 hidden pointer-events-none z-30">
@@ -168,10 +168,14 @@
                 </div>
 
                 <!-- Triple-Tree Grove Stage (JS Injected) -->
-                <div id="groveStage" class="w-full justify-between items-end gap-1 sm:gap-4 mt-4 mb-2 z-20 h-48 sm:h-56 px-2 sm:px-6 select-none relative flex">
-                    <!-- Global Grass Background -->
-                    <div class="absolute inset-x-0 bottom-1 flex justify-center -z-10 pointer-events-none opacity-90 drop-shadow-sm">
-                        <div class="w-full max-w-sm h-12 sm:h-16 bg-green-500/20 rounded-[100%] blur-[2px] border-b-[6px] border-green-600/30"></div>
+                <div id="groveStage" class="w-full justify-between items-end gap-1 sm:gap-4 mt-6 mb-2 z-20 h-48 sm:h-56 px-2 sm:px-6 select-none relative flex">
+                    <!-- Pastoral Field Background -->
+                    <div class="absolute inset-x-0 bottom-0 sm:-bottom-2 -z-10 pointer-events-none opacity-100 flex justify-center overflow-hidden">
+                        <svg viewBox="0 0 1000 200" preserveAspectRatio="none" class="w-full max-w-5xl h-24 sm:h-32 drop-shadow-md">
+                           <path d="M 0 150 Q 250 70 500 120 T 1000 150 L 1000 200 L 0 200 Z" fill="#bbf7d0"/>
+                           <path d="M 0 180 Q 300 110 550 140 T 1000 160 L 1000 200 L 0 200 Z" fill="#86efac"/>
+                           <path d="M 0 200 Q 400 150 600 180 T 1000 190 L 1000 200 L 0 200 Z" fill="#4ade80"/>
+                        </svg>
                     </div>
                     <!-- Trees inject here -->
                 </div>
@@ -346,7 +350,7 @@
 
     <!-- App Version Tag -->
     <div class="fixed bottom-1 right-2 text-[8px] sm:text-[10px] text-slate-400/80 font-mono z-[500] pointer-events-none select-none">
-        v3.0.1
+        v3.0.3
     </div>
 
 </body>
