@@ -229,12 +229,57 @@ function renderGroveStage() {
         if(isSad) scale -= 0.15;
         
         if (isPlanted) {
+                let alertHTML = '';
+                if (!isActive && isSad) {
+                    alertHTML = `<div class="absolute -top-10 bg-red-500/90 text-white rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-bold animate-pulse font-mono flex items-center gap-1 shadow-md z-50 whitespace-nowrap"><span class="animate-bounce">⚠️</span> Needs Care</div>`;
+                } else if (!isActive && progress[slot] >= 100) {
+                    alertHTML = `<div class="absolute -top-10 bg-yellow-400 text-yellow-900 rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-bold animate-bounce font-mono flex items-center gap-1 shadow-md z-50 whitespace-nowrap">✨ MAX</div>`;
+                }
+
+                // Automation Graphics Injections
+                let automationHTML = '';
+                if (upgTiers.water >= 5) { // Auto-Sprinkler
+                    automationHTML += `<svg class="absolute bottom-2 -left-4 w-8 h-8 opacity-80" viewBox="0 0 50 50">
+                        <path d="M 20 50 L 20 40 L 30 40 L 30 50 Z" fill="#64748b"/>
+                        <path d="M 15 40 L 35 40 L 30 35 L 20 35 Z" fill="#94a3b8"/>
+                        <g class="animate-[spin_2s_linear_infinite] origin-[25px_35px]">
+                            <line x1="10" y1="30" x2="40" y2="30" stroke="#cbd5e1" stroke-width="4" stroke-linecap="round"/>
+                            <circle cx="25" cy="35" r="4" fill="#3b82f6"/>
+                            <!-- Water sprays -->
+                            <path d="M 12 30 Q 5 20 0 30 M 38 30 Q 45 20 50 30 M 20 30 Q 25 20 30 30" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="2,2" fill="none" class="animate-pulse"/>
+                        </g>
+                    </svg>`;
+                }
+                if (upgTiers.feed >= 5) { // Auto-Feeder
+                    automationHTML += `<svg class="absolute bottom-0 -right-4 w-10 h-12 opacity-90 animate-[bounce_4s_infinite]" viewBox="0 0 50 60">
+                        <rect x="15" y="30" width="20" height="30" fill="#f59e0b" rx="2"/>
+                        <path d="M 10 30 L 40 30 L 35 15 L 15 15 Z" fill="#d97706"/>
+                        <circle cx="25" cy="20" r="4" fill="#64748b"/>
+                        <rect x="22" y="10" width="6" height="5" fill="#fcd34d"/>
+                        <path d="M 25 10 Q 30 -5 40 5" stroke="#92400e" stroke-width="2" fill="none" stroke-linecap="round"/>
+                        <circle cx="25" cy="45" r="5" fill="#fcd34d" class="animate-pulse"/>
+                    </svg>`;
+                }
+                if (upgTiers.trim >= 5) { // Auto-Drone
+                    automationHTML += `<svg class="absolute top-10 right-0 w-8 h-8 opacity-90 animate-[bounce_3s_ease-in-out_infinite] hover:translate-x-2 transition-transform" viewBox="0 0 50 50">
+                        <circle cx="25" cy="25" r="10" fill="#cbd5e1"/>
+                        <ellipse cx="25" cy="25" rx="20" ry="4" font-size="20" fill="none" stroke="#94a3b8" stroke-width="2"/>
+                        <circle cx="25" cy="15" r="2" fill="#ef4444" class="animate-ping"/>
+                        <path d="M 20 35 L 20 45 M 30 35 L 30 45" stroke="#94a3b8" stroke-width="2"/>
+                        <path d="M 15 45 L 35 45" stroke="#64748b" stroke-width="2"/>
+                        <circle cx="15" cy="20" r="8" fill="#e2e8f0" opacity="0.5" class="animate-spin origin-center"/>
+                        <circle cx="35" cy="20" r="8" fill="#e2e8f0" opacity="0.5" class="animate-spin origin-center"/>
+                    </svg>`;
+                }
+
             stage.innerHTML += `
             <div id="treeSlot-${slot}" class="flex-1 max-w-[33%] min-h-[140px] relative cursor-pointer group flex flex-col justify-end items-center transition-all ${isActive ? '-translate-y-2' : ''}" onclick="setActiveTree(${slot})">
+                ${alertHTML}
                 <div class="absolute -top-6 ${isActive ? 'bg-green-500 text-white shadow-md' : 'bg-slate-800 text-white scale-0 group-hover:scale-100'} px-2 py-0.5 rounded-full text-[9px] font-bold z-50 transition-all text-center uppercase truncate w-24">${trees[plantedTrees[slot]].name}</div>
                 <div class="w-full h-full flex items-end justify-center pointer-events-none" style="transform: scale(${scale}); transform-origin: bottom;">
                     ${generateTreeSVG(slot, isSad)}
                 </div>
+                ${automationHTML}
             </div>`;
         } else {
             let pCount = plantedTrees.filter(t => t !== null).length;
@@ -452,7 +497,9 @@ function handleDrag(e) {
             // TIER 3: Leaf blower -> instantly trims all leaves over bounding box
             const treeRect = activeSlot.getBoundingClientRect();
             if (e.clientX > treeRect.left && e.clientX < treeRect.right && e.clientY > treeRect.top && e.clientY < treeRect.bottom) {
-                leaves.forEach(l => snipLeaf(l, e.clientX, e.clientY, true)); // batch snip
+                // Batch snip animation and rewards
+                spawnActionFeedback(e.clientX, e.clientY, "💨 WHOOSH!");
+                leaves.forEach(l => snipLeaf(l, e.clientX, e.clientY, true)); 
             }
         } else {
             leaves.forEach(leaf => {
@@ -523,36 +570,37 @@ function endDrag(e) {
 // Spawners & Mini FX
 function spawnExcessLeaves() {
     setInterval(() => {
-        if(plantedTrees[activeTreeIndex] === null) return;
-        
-        // TIER 5 AUTO-DRONE check
-        if (upgTiers.trim >= 5) {
-            // Automation handles it instantly, don't even render.
-            // Just gain XP/Coins passively!
-            if(Math.random() > 0.6) {
-                progress[activeTreeIndex] = Math.min(100, progress[activeTreeIndex] + 5);
-                addCoins(1);
-                updateUI();
+        [0, 1, 2].forEach(slot => {
+            if(plantedTrees[slot] === null) return;
+            
+            // TIER 5 AUTO-DRONE check
+            if (upgTiers.trim >= 5) {
+                // Automation handles it instantly
+                if(Math.random() > 0.6) {
+                    progress[slot] = Math.min(100, progress[slot] + 5);
+                    addCoins(1);
+                    if (slot === activeTreeIndex) updateUI();
+                }
+                return;
             }
-            return;
-        }
 
-        const activeSlot = document.querySelector(`#treeSVG-${activeTreeIndex}`);
-        if(!activeSlot) return;
-        
-        if(Math.random() > 0.4 && document.querySelectorAll('.excess-leaf').length < 6) {
-            const leaf = document.createElementNS("http://www.w3.org/2000/svg", 'path');
-            leaf.setAttribute('class', 'excess-leaf drop-shadow-sm cursor-crosshair');
-            const x = Math.random() * 60 + 30; const y = Math.random() * 50 + 20; 
-            leaf.setAttribute('d', `M ${x} ${y} l 12 -15 l 8 10 Z`);
-            leaf.setAttribute('fill', '#059669'); leaf.setAttribute('stroke', '#064e3b');
-            leaf.setAttribute('stroke-width', '1'); leaf.style.transition = 'all 0.3s ease';
-            leaf.style.opacity = '0';
-            const face = activeSlot.querySelector(`#face-${activeTreeIndex}`);
-            if(face) activeSlot.insertBefore(leaf, face);
-            else activeSlot.appendChild(leaf);
-            setTimeout(() => leaf.style.opacity = '1', 50);
-        }
+            const treeSVGElem = document.querySelector(`#treeSVG-${slot}`);
+            if(!treeSVGElem) return;
+            
+            if(Math.random() > 0.4 && document.querySelectorAll(`#treeSVG-${slot} .excess-leaf`).length < 6) {
+                const leaf = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+                leaf.setAttribute('class', 'excess-leaf drop-shadow-sm cursor-crosshair');
+                const x = Math.random() * 60 + 30; const y = Math.random() * 50 + 20; 
+                leaf.setAttribute('d', `M ${x} ${y} l 12 -15 l 8 10 Z`);
+                leaf.setAttribute('fill', '#059669'); leaf.setAttribute('stroke', '#064e3b');
+                leaf.setAttribute('stroke-width', '1'); leaf.style.transition = 'all 0.3s ease';
+                leaf.style.opacity = '0';
+                const face = treeSVGElem.querySelector(`#face-${slot}`);
+                if(face) treeSVGElem.insertBefore(leaf, face);
+                else treeSVGElem.appendChild(leaf);
+                setTimeout(() => leaf.style.opacity = '1', 50);
+            }
+        });
     }, 2000);
 }
 
