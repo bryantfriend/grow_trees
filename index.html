@@ -162,43 +162,18 @@
                    <span class="text-xl">🌊</span>
                 </div>
 
-                <div id="butterflyContainer" class="absolute inset-0 hidden pointer-events-none">
+                <div id="butterflyContainer" class="absolute inset-0 hidden pointer-events-none z-30">
                     <span class="butterfly absolute text-2xl -top-10 -left-10">🦋</span>
                     <span class="butterfly absolute text-2xl -top-20 right-0" style="animation-delay: 1s">🦋</span>
                 </div>
 
-                <div id="treeClickArea" class="cursor-pointer select-none transition-all mt-4 mb-2 z-20 relative" onclick="handleTreeInteraction(event)">
-                    <!-- Organic Grass/Dirt Patch Background -->
-                    <div class="absolute inset-x-0 bottom-4 flex justify-center -z-10 pointer-events-none opacity-90 block">
-                        <div class="w-48 sm:w-64 h-12 sm:h-16 bg-green-500/20 rounded-[100%] blur-[2px] border-b-[6px] border-green-600/30"></div>
+                <!-- Triple-Tree Grove Stage (JS Injected) -->
+                <div id="groveStage" class="w-full justify-between items-end gap-1 sm:gap-4 mt-4 mb-2 z-20 h-48 sm:h-56 px-2 sm:px-6 select-none relative flex">
+                    <!-- Global Grass Background -->
+                    <div class="absolute inset-x-0 bottom-1 flex justify-center -z-10 pointer-events-none opacity-90 drop-shadow-sm">
+                        <div class="w-full max-w-sm h-12 sm:h-16 bg-green-500/20 rounded-[100%] blur-[2px] border-b-[6px] border-green-600/30"></div>
                     </div>
-                    
-                    <!-- Giant Tree Focal Point - Added idle-sway animation -->
-                    <svg id="treeSVG" class="tree-svg w-56 h-56 sm:w-64 sm:h-64 mx-auto animate-[sway_4s_ease-in-out_infinite] origin-bottom transition-all duration-700 drop-shadow-[0_15px_15px_rgba(34,197,94,0.3)]" viewBox="0 0 120 120">
-                        <!-- Trunk -->
-                        <path id="trunk" d="M 45 115 C 45 95 52 85 52 75 L 68 75 C 68 85 75 95 75 115 Z" fill="#8B5A2B" stroke="#4a3018" stroke-width="2.5" stroke-linejoin="round"/>
-                        <path d="M 49 115 C 51 105 52 100 55 90 M 70 115 C 68 105 68 100 65 92" stroke="#5c4033" stroke-width="2" fill="none" stroke-linecap="round"/>
-                        
-                        <!-- Fluffy Canopy -->
-                        <path id="leaves" d="M 35 80 C 15 80 10 55 25 45 C 20 20 40 10 55 15 C 65 -5 90 0 95 20 C 115 15 120 40 105 55 C 120 65 110 90 90 85 C 80 100 60 100 55 90 C 45 100 30 95 35 80 Z" fill="#a7f3d0" stroke="#065f46" stroke-width="3" stroke-linejoin="round"/>
-                        
-                        <!-- Canopy Texture Details -->
-                        <path d="M 30 50 C 35 40 45 40 45 40 M 75 25 C 85 25 90 35 90 35 M 95 65 C 90 75 80 70 80 70 M 35 85 C 45 90 55 85 55 85" stroke="#065f46" stroke-width="2" fill="none" opacity="0.4" stroke-linecap="round"/>
-
-                        <!-- Kawaii Face -->
-                        <g id="face">
-                            <!-- Cheeks -->
-                            <ellipse cx="40" cy="65" rx="6" ry="3.5" fill="#fecdd3" opacity="0.9"/>
-                            <ellipse cx="80" cy="65" rx="6" ry="3.5" fill="#fecdd3" opacity="0.9"/>
-                            <!-- Eyes -->
-                            <circle cx="50" cy="58" r="5" fill="#1e293b"/>
-                            <circle cx="48" cy="56" r="2" fill="#ffffff"/>
-                            <circle cx="70" cy="58" r="5" fill="#1e293b"/>
-                            <circle cx="68" cy="56" r="2" fill="#ffffff"/>
-                            <!-- Mouth -->
-                            <path id="mouth" d="M 56 61 Q 60 67 64 61" stroke="#1e293b" fill="none" stroke-width="2.5" stroke-linecap="round"/>
-                        </g>
-                    </svg>
+                    <!-- Trees inject here -->
                 </div>
             </div>
 
@@ -255,17 +230,11 @@
                 </div>
             </div>
             
-            <!-- Tree Type Selector (Bottom) -->
-            <div id="bottomPlantedTrees" class="w-full px-4 mb-2 z-40 bg-white/60 py-2 rounded-xl backdrop-blur-md shadow-sm border border-slate-100 pb-2">
-                <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center mb-1.5">Your Planted Trees 🌳</h3>
-                <div class="flex overflow-x-auto gap-2 pb-1 hide-scrollbar snap-x" id="treeCarousel"></div>
-            </div>
-            
             <!-- Tool Upgrades Panel (Bottom) -->
             <div id="bottomToolUpgrades" class="w-full px-4 mb-3 z-30 flex gap-2 justify-center">
-                <button onclick="upgradeTool('water')" id="upg-water" class="flex-1 bg-cyan-100 hover:bg-cyan-200 border border-cyan-300 text-cyan-800 rounded-lg py-1.5 text-[10px] font-bold shadow-sm active:scale-95 transition-transform">💧 UPG (100 🪙)</button>
-                <button onclick="upgradeTool('trim')" id="upg-trim" class="flex-1 bg-indigo-100 hover:bg-indigo-200 border border-indigo-300 text-indigo-800 rounded-lg py-1.5 text-[10px] font-bold shadow-sm active:scale-95 transition-transform">✂️ UPG (150 🪙)</button>
-                <button onclick="upgradeTool('feed')" id="upg-feed" class="flex-1 bg-orange-100 hover:bg-orange-200 border border-orange-300 text-orange-800 rounded-lg py-1.5 text-[10px] font-bold shadow-sm active:scale-95 transition-transform">🌾 UPG (200 🪙)</button>
+                <button onclick="openUpgradesModal('water')" class="flex-1 bg-cyan-100 hover:bg-cyan-200 border border-cyan-300 text-cyan-800 rounded-lg py-2 text-[10px] sm:text-xs font-bold shadow-sm active:scale-95 transition-transform">💧 Water Upgrades</button>
+                <button onclick="openUpgradesModal('trim')" class="flex-1 bg-indigo-100 hover:bg-indigo-200 border border-indigo-300 text-indigo-800 rounded-lg py-2 text-[10px] sm:text-xs font-bold shadow-sm active:scale-95 transition-transform">✂️ Trim Upgrades</button>
+                <button onclick="openUpgradesModal('feed')" class="flex-1 bg-orange-100 hover:bg-orange-200 border border-orange-300 text-orange-800 rounded-lg py-2 text-[10px] sm:text-xs font-bold shadow-sm active:scale-95 transition-transform">🌾 Feed Upgrades</button>
             </div>
             
             <h2 id="treeTitle" class="hidden"></h2>
@@ -342,5 +311,38 @@
             </button>
         </div>
     </div>
+
+    <!-- Plant Tree Species Selection Modal -->
+    <div id="plantTreeModal" class="hidden fixed inset-0 z-[300] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden p-6 relative flex flex-col max-h-[80vh]">
+            <button onclick="document.getElementById('plantTreeModal').classList.add('hidden')" class="absolute top-4 right-4 text-3xl text-slate-400 hover:text-slate-600 outline-none z-10">&times;</button>
+            <h2 class="text-2xl font-bold text-slate-800 mb-1 text-center font-brand">Plant a New Tree 🌱</h2>
+            <p class="text-xs text-slate-500 text-center mb-6 uppercase tracking-widest" id="plantCostDisplay">Cost: 500 🪙</p>
+            
+            <div id="plantModalGrid" class="grid grid-cols-2 gap-3 overflow-y-auto pr-2 pb-4">
+                <!-- Javascript injects species options here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Tool Upgrades Modal -->
+    <div id="toolUpgradesModal" class="hidden fixed inset-0 z-[300] bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 pb-0">
+        <div class="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md shadow-2xl overflow-hidden p-6 relative flex flex-col max-h-[85vh]">
+            <button onclick="document.getElementById('toolUpgradesModal').classList.add('hidden')" class="absolute top-4 right-4 text-3xl text-slate-400 hover:text-slate-600 outline-none z-10">&times;</button>
+            
+            <div class="flex items-center gap-3 mb-6">
+                <div id="upgModalEmoji" class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-2xl shadow-inner">💧</div>
+                <div>
+                    <h2 id="upgModalTitle" class="text-2xl font-bold text-slate-800 leading-tight">Water Upgrades</h2>
+                    <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-0.5">Automate & Enhance</p>
+                </div>
+            </div>
+            
+            <div id="upgModalList" class="flex flex-col gap-3 overflow-y-auto pr-2 pb-6">
+                <!-- JS injects the 5 tiers here -->
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
