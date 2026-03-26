@@ -49,7 +49,7 @@ const UPG_DATA = {
 function addCoins(amount) {
     coins += amount;
     const pop = document.createElement('div');
-    pop.innerText = `+${amount} 🪙`;
+    pop.innerText = `+${amount} 💰`;
     pop.className = 'fixed text-3xl font-bold text-yellow-500 pointer-events-none z-50 animate-pop-in drop-shadow-lg';
     pop.style.left = '50%'; pop.style.top = '60%'; pop.style.transform = 'translate(-50%, -50%)';
     document.body.appendChild(pop);
@@ -91,7 +91,7 @@ window.openPlantModal = function(slotIndex) {
     let plantedCount = plantedTrees.filter(t => t !== null).length;
     const cost = plantedCount === 1 ? 500 : 1000;
     
-    costDisp.innerText = `Cost: ${cost} 🪙`;
+    costDisp.innerText = `Cost: ${cost} 💰`;
     grid.innerHTML = '';
     
     trees.forEach((tree, idx) => {
@@ -119,7 +119,7 @@ window.plantTreeSpecies = function(slotIndex, speciesIndex, cost) {
         renderGroveStage();
         updateUI();
     } else {
-        toast(`Not enough coins! Need ${cost} 🪙`);
+        toast(`Not enough coins! Need ${cost} 💰`);
     }
 };
 
@@ -150,7 +150,7 @@ window.openUpgradesModal = function(type) {
             btnHtml = `<button class="opacity-50 cursor-not-allowed bg-slate-200 text-slate-500 rounded-xl py-2 px-4 text-xs font-bold" disabled>Purchased</button>`;
         } else if (isNext) {
             statusHtml = `<span class="text-[10px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full uppercase tracking-widest">Available</span>`;
-            btnHtml = `<button onclick="buyUpgrade('${type}')" class="bg-${type==='water'?'cyan':(type==='trim'?'indigo':'orange')}-500 hover:brightness-110 text-white rounded-xl py-2 px-4 shadow-[0_4px_0_rgba(0,0,0,0.1)] active:translate-y-1 active:shadow-none transition-all text-xs font-bold">Buy (${tier.cost} 🪙)</button>`;
+            btnHtml = `<button onclick="buyUpgrade('${type}')" class="bg-${type==='water'?'cyan':(type==='trim'?'indigo':'orange')}-500 hover:brightness-110 text-white rounded-xl py-2 px-4 shadow-[0_4px_0_rgba(0,0,0,0.1)] active:translate-y-1 active:shadow-none transition-all text-xs font-bold">Buy (${tier.cost} 💰)</button>`;
         } else {
             statusHtml = `<span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full uppercase tracking-widest">Locked</span>`;
             btnHtml = `<button class="opacity-50 cursor-not-allowed bg-slate-200 text-slate-500 rounded-xl py-2 px-4 text-xs font-bold" disabled>Requires Prev</button>`;
@@ -187,7 +187,7 @@ window.buyUpgrade = function(type) {
         openUpgradesModal(type); // refresh
         updateUI();
     } else {
-        toast(`Not enough coins! Need ${tierData.cost} 🪙`);
+        toast(`Not enough coins! Need ${tierData.cost} 💰`);
     }
 };
 
@@ -239,8 +239,8 @@ function renderGroveStage() {
         } else {
             let pCount = plantedTrees.filter(t => t !== null).length;
             let canPlant = false; let costStr = ""; let btnAction = "";
-            if (slot === 1 && pCount === 1) { canPlant = true; costStr = "Plant (500 🪙)"; btnAction = `openPlantModal(${slot})`; }
-            else if (slot === 2 && pCount === 2) { canPlant = true; costStr = "Plant (1000 🪙)"; btnAction = `openPlantModal(${slot})`; }
+            if (slot === 1 && pCount === 1) { canPlant = true; costStr = "Plant (500 💰)"; btnAction = `openPlantModal(${slot})`; }
+            else if (slot === 2 && pCount === 2) { canPlant = true; costStr = "Plant (1000 💰)"; btnAction = `openPlantModal(${slot})`; }
             else { canPlant = false; costStr = "Locked"; btnAction = `toast('Plant previous slots first!')`; }
             
             stage.innerHTML += `
@@ -340,18 +340,8 @@ window.showInfoModal = window.showEcoModal; // Map legacy button to the new poll
 
 window.simulateDonate = function() {
     document.getElementById('ecoModal').classList.add('hidden');
-    toast("Thank you for your $5 simulated donation! +500 🪙");
+    toast("Thank you for your simulated donation! +500 💰");
     addCoins(500);
-};
-
-window.toggleFullscreen = function() {
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => {
-            toast(`Error attempting to enable fullscreen: ${err.message}`);
-        });
-    } else {
-        document.exitFullscreen();
-    }
 };
 
 let ghost = null;
@@ -435,7 +425,7 @@ function handleDrag(e) {
                         let coinGain = 5;
                         if (wTier >= 3) coinGain = 10; // Coin Infusion
                         
-                        let msg = `+${gain} Hydration 💧 | +${coinGain} 🪙`;
+                        let msg = `+${gain} Hydration 💧 | +${coinGain} 💰`;
                         
                         // TIER 4: Miracle Grow Water
                         if (wTier >= 4) {
@@ -496,7 +486,7 @@ function handleDrag(e) {
                     let coinGain = 10;
                     if(fTier >= 3) coinGain = 20; // Golden Fertilizer
                     
-                    let msg = `+${gain} Nutrition 🍎 | +${coinGain} 🪙`;
+                    let msg = `+${gain} Nutrition 🍎 | +${coinGain} 💰`;
                     
                     // TIER 4: Hydrating Mulch
                     if(fTier >= 4) {
