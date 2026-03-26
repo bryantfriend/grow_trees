@@ -344,6 +344,16 @@ window.simulateDonate = function() {
     addCoins(500);
 };
 
+window.toggleFullscreen = function() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            toast(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+};
+
 let ghost = null;
 let currentTool = null;
 let isFilled = false;
