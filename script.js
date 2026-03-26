@@ -79,6 +79,7 @@ window.startGame = function() {
 window.setActiveTree = function(slotIndex) {
     if (plantedTrees[slotIndex] === null) return;
     activeTreeIndex = slotIndex;
+    renderGroveStage();
     updateUI();
 };
 
@@ -437,7 +438,6 @@ function handleDrag(e) {
                         
                         spawnActionFeedback(e.clientX, e.clientY, "✨");
                         updateUI();
-                        renderGroveStage();
                     }, 500);
                     endDrag(); 
                 }
@@ -501,7 +501,6 @@ function handleDrag(e) {
                     activeSlot.classList.add('scale-105');
                     setTimeout(() => activeSlot.classList.remove('scale-105'), 300);
                     updateUI();
-                    renderGroveStage();
                     endDrag();
                 }
             }
@@ -533,7 +532,7 @@ function spawnExcessLeaves() {
             if(Math.random() > 0.6) {
                 progress[activeTreeIndex] = Math.min(100, progress[activeTreeIndex] + 5);
                 addCoins(1);
-                updateUI(); renderGroveStage();
+                updateUI();
             }
             return;
         }
@@ -575,7 +574,7 @@ function snipLeaf(leaf, cx, cy, isBatch) {
             nutrition[activeTreeIndex] = Math.min(100, nutrition[activeTreeIndex] + 5);
         }
         addCoins(coinGain); 
-        updateUI(); renderGroveStage();
+        updateUI();
     }, 300);
     
     const mouth = document.getElementById(`mouth-${activeTreeIndex}`);
@@ -644,7 +643,7 @@ function startSimulationLoops() {
             }
         });
         
-        if (changed) { updateUI(); renderGroveStage(); }
+        if (changed) { updateUI(); }
     }, 1000);
 
     const SVG_NS = "http://www.w3.org/2000/svg";
